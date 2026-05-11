@@ -6,11 +6,6 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.22.2",
-    "sqlite3": "^5.1.7"
-  },
-  "description": "",
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+    "express": "^4.19.2"
+  }
 }
