@@ -12,7 +12,7 @@
     </style>
 </head>
 <body>
-    <h1>AlightSmart Admin</h1>
+    <h1>AlightSmart Admin Dashboard</h1>
     <p>Password: tunde6035</p>
     <table id="table">
         <thead>
@@ -28,12 +28,12 @@
     </table>
 
     <script>
-        async function load() {
+        async function loadRecords() {
             const res = await fetch('/api/records');
-            const data = await res.json();
+            const records = await res.json();
             const tbody = document.querySelector('#table tbody');
             tbody.innerHTML = "";
-            data.forEach(r => {
+            records.forEach(r => {
                 tbody.innerHTML += `<tr>
                     <td>${r.timestamp}</td>
                     <td>${r.type}</td>
@@ -43,8 +43,8 @@
                 </tr>`;
             });
         }
-        setInterval(load, 3000);
-        window.onload = load;
+        setInterval(loadRecords, 3000);
+        window.onload = loadRecords;
     </script>
 </body>
 </html>
